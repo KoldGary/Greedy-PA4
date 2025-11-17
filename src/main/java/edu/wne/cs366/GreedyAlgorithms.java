@@ -25,7 +25,7 @@ import java.util.List;
  * - Connect 5 and 4 → cost = 9, remaining = [9]
  * - Total cost = 5 + 9 = 14
  *
- * @author [Student Name]
+ * @author [Adrian Gary]
  * @date Due: November 6, 2025
  */
 public class GreedyAlgorithms {
@@ -59,21 +59,49 @@ public class GreedyAlgorithms {
      * @throws IllegalArgumentException if sticks array is null or has less than 2 elements
      */
     public static int connectSticksNaive(int[] sticks) {
-        // TODO: Implement greedy naive approach with UNSORTED ArrayList
-        // 1. Validate input (null check, length check)
-        // 2. Copy sticks to ArrayList for dynamic removal (keep UNSORTED)
-        // 3. Loop while more than 1 stick remains:
-        //    a. Find index of first minimum via LINEAR SCAN through unsorted list
-        //    b. Find index of second minimum (excluding first) via LINEAR SCAN
-        //    c. Calculate cost (sum of two minimums)
-        //    d. Remove the two sticks (remove larger index first!)
-        //    e. Add their sum back to the list (append to end - keep UNSORTED!)
-        //    f. Add cost to total
-        // 4. Return total cost
-
-        throw new UnsupportedOperationException("TODO: Implement connectSticksNaive");
+    if (sticks == null || sticks.length < 2) {
+        throw new IllegalArgumentException("sticks array must contain at least two elements");
+    }
+    List<Integer> list = new ArrayList<>();
+    for (int len : sticks) {
+        list.add(len);
+    }
+    int totalCost = 0;
+    while (list.size() > 1) {
+        int min1Index = 0;
+        int min1Value = list.get(0);
+        for (int i = 1; i < list.size(); i++) {
+            int val = list.get(i);
+            if (val < min1Value) {
+                min1Value = val;
+                min1Index = i;
+            }
+        }
+        int min2Index = -1;
+        int min2Value = Integer.MAX_VALUE;
+        for (int i = 0; i < list.size(); i++) {
+            if (i == min1Index) continue;
+            int val = list.get(i);
+            if (val < min2Value) {
+                min2Value = val;
+                min2Index = i;
+            }
+        }
+        int combined = min1Value + min2Value;
+        totalCost += combined;
+        if (min1Index > min2Index) {
+            list.remove(min1Index);
+            list.remove(min2Index);
+        } else {
+            list.remove(min2Index);
+            list.remove(min1Index);
+        }
+        list.add(combined);
     }
 
+   
+    return totalCost;
+}
     /**
      * Calculate minimum cost to connect all sticks using GREEDY OPTIMIZED approach.
      *
@@ -101,21 +129,24 @@ public class GreedyAlgorithms {
      * @throws IllegalArgumentException if sticks array is null or has less than 2 elements
      */
     public static int connectSticksHeap(int[] sticks) {
-        // TODO: Implement heap-based approach
-        // 1. Validate input (null check, length check)
-        // 2. Create PriorityQueue<Integer> (min-heap by default)
-        // 3. Add all sticks to the heap
-        // 4. Loop while heap size > 1:
-        //    a. Extract first minimum (poll())
-        //    b. Extract second minimum (poll())
-        //    c. Calculate cost (sum of two minimums)
-        //    d. Add their sum back to heap (offer())
-        //    e. Add cost to total
-        // 5. Return total cost
-
-        throw new UnsupportedOperationException("TODO: Implement connectSticksHeap");
+    if (sticks == null || sticks.length < 2) {
+        throw new IllegalArgumentException("sticks array must contain at least two elements");
+    }
+    PriorityQueue<Integer> heap = new PriorityQueue<>();
+    for (int len : sticks) {
+        heap.offer(len);
+    }
+    int totalCost = 0;
+    while (heap.size() > 1) {
+        int first = heap.poll();
+        int second = heap.poll();
+        int combined = first + second;
+        totalCost += combined;
+        heap.offer(combined);
     }
 
+    return totalCost;
+}
     /**
      * Compare the performance of Greedy Naive vs Greedy Optimized approaches empirically.
      *
@@ -155,10 +186,6 @@ public class GreedyAlgorithms {
     }
 
     /**
-     * Main method for testing and demonstration.
-     *
-     * Runs example test cases and performance comparisons to help students
-     * understand the algorithm and observe the efficiency differences.
      */
     public static void main(String[] args) {
         System.out.println("CS366 - PA4: Greedy Algorithms - Minimum Cost to Connect Sticks");
